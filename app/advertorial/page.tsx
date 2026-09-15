@@ -28,6 +28,7 @@ export default function AdvertorialRoute() {
         ownerName={config.ownerName}
         headshotUrl={config.headshotUrl}
         serviceAreas={serviceAreas}
+        disqualifiedPropertyTypes={config.disqualifiedPropertyTypes.split(",").map(s => s.trim()).filter(Boolean)}
         motivationV2={config.motivationV2}
       />
     </main>

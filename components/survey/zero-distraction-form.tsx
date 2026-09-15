@@ -91,6 +91,7 @@ const DQ_REASONS = {
   noReason: "It sounds like you're just gathering information right now. When you're ready to sell, come back and we'll get you a cash offer.",
   excellentCondition: "Your home sounds like it's in great shape. We focus on properties that need some work, so we're not able to make a competitive offer on a move-in-ready home.",
   shortOwnership: "Because you've owned the home for less than 5 years, we're not able to make an offer that works right now. If you've owned it longer or your situation changes, we'd be glad to take a look.",
+  propertyType: "We're focused on single-family and multi-family homes right now, so we're not able to make an offer on this type of property.",
 } as const
 type DqKey = keyof typeof DQ_REASONS
 
@@ -109,12 +110,13 @@ function checkHardDq(key: keyof FormState, value: string): DqKey | null {
 
 // Pixel qualification gate. A completed lead fires the Meta Lead pixel only
 // when all soft fit rules pass. Hard-DQ'd users never reach here.
-function isQualifiedLead(form: FormState): boolean {
+function isQualifiedLead(form: FormState, disqualifiedPropertyTypes: string[]): boolean {
   const ownerOk = ["owner", "part-owner", "family"].includes(form.whoAreYou)
   const timelineOk = form.timeline !== "exploring"
   const yearsOk = form.yearsOwned !== "0-2" && form.yearsOwned !== "3-5"
   const conditionOk = form.condition !== "excellent"
-  return ownerOk && timelineOk && yearsOk && conditionOk
+  const propertyOk = !disqualifiedPropertyTypes.includes(form.propertyType)
+  return ownerOk && timelineOk && yearsOk && conditionOk && propertyOk
 }
 
 function formatPhoneDisplay(raw: string): string {
@@ -333,7 +335,7 @@ export function ZeroDistractionForm({ accentColor, serviceAreas, disqualifiedPro
       })
 
       const tracking = readCapturedTracking()
-      const qualified = isQualifiedLead(form)
+      const qualified = isQualifiedLead(form, disqualifiedPropertyTypes)
 
       const emailNorm = form.email.toLowerCase().trim().replace(/[^a-z0-9]/g, "")
       const eventID = emailNorm
@@ -460,6 +462,8 @@ export function ZeroDistractionForm({ accentColor, serviceAreas, disqualifiedPro
                 onClick={() => {
                   if (isPropertyDisqualified(c.id)) {
                     update("propertyType", c.id)
+                    setTimeout(() => setDq("propertyType"), 150)
+                    return
                   }
                   pickAndAdvance("propertyType", c.id)
                 }}
