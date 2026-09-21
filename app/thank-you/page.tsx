@@ -3,6 +3,8 @@ import Link from "next/link"
 import { CheckCircle2, Phone, MessageSquare } from "lucide-react"
 import config from "@/lib/config"
 import { ClickToPlayVideo } from "@/components/thankyou/click-to-play-video"
+import { VIDEO_LIBRARY } from "@/lib/thankyou-videos"
+import { VideoLibrary } from "@/components/thankyou/video-library"
 import { ContactCTA } from "@/components/article/contact-cta"
 import { ARTICLES } from "@/lib/articles"
 import { isYouTubeUrl, toYouTubeEmbed } from "@/lib/youtube"
@@ -352,6 +354,17 @@ function ThankYouV1() {
             <strong>24 hours</strong> with your cash offer. In the meantime, here are answers to common questions.
           </p>
         </div>
+
+        {/* Thank-you video library (606 format) */}
+        {VIDEO_LIBRARY.length > 0 && (
+          <div className="mb-8">
+            <div className="text-center mb-4">
+              <p className="uppercase tracking-widest text-xs font-semibold text-gray-500 mb-1">While You Wait</p>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">Browse Our Video Library</h2>
+            </div>
+            <VideoLibrary categories={VIDEO_LIBRARY} accentColor={config.accentColor} />
+          </div>
+        )}
 
         {/* Video section */}
         {process.env.NEXT_PUBLIC_THANKYOU_VIDEO_URL && (
